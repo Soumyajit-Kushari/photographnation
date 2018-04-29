@@ -1,0 +1,35 @@
+html
+  head
+    title Home
+    link(rel="stylesheet", href="css/style.css")
+    script.
+      
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("img").innerHTML = this.responseText;
+      }
+      };
+      xhttp.open("GET", "./img", true);
+      xhttp.send();
+      
+  body
+    #Home
+        .box.green.center
+          - var grav = 'https://www.gravatar.com/avatar/' + email_md5 +'?s=128&d=/img/user.png'
+          div 
+            img(src = grav)
+            br
+            br
+            span(style='./') #{email}
+            br
+            br
+            a(href='./')
+              button(style='width:fit-content;') Upload
+         
+        #img
+         
+
+
+          
+             

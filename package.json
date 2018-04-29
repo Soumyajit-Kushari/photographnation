@@ -1,0 +1,27 @@
+{
+  "name": "visualartist",
+  "version": "1.0.0",
+  "description": "a social network for artist and photographers",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "visualartist"
+  },
+  "keywords": [
+    "visualartist"
+  ],
+  "author": "worktogether",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^1.0.3",
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.3",
+    "md5": "^2.2.1",
+    "pug": "^2.0.3",
+    "uuid": "^3.2.1"
+  }
+}
