@@ -21,5 +21,5 @@ exports.comparePassword = function (plainPass, hashword, callback) {
 };
 
 exports.GenerateUniqueID = function (callback) {
-  return callback(uuidv4());
+  return callback(uuid());
 }

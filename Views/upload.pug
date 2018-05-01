@@ -1,0 +1,13 @@
+html
+  head
+    title Upload
+    link(rel="stylesheet", href="css/style.css")
+  body.blue
+    #login-form.box
+      form(action="/upload-ftp", method="post" , enctype="multipart/form-data")
+        h1 Upload image
+        label(for="file") Choose a file
+        input(type="file",name="filetoupload",placeholder="file-picker",id="file-picker")
+        div
+        button(type="submit") Upload
+        .err

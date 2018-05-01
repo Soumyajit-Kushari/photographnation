@@ -3,7 +3,10 @@ const express = require('express')
     , cookieParser = require('cookie-parser')
     , bodyParser = require('body-parser')
     , md5 = require('md5')
-    , fs = require('fs');
+    , fs = require('fs')
+    , formidable = require('formidable')
+    , client = require('ftp')
+    , security = require('./security');
 
 const app = express();
 
@@ -48,6 +51,54 @@ app.get('/img', function (req, res) {
     });
 
 });
+
+app.get('/upload', function (req, res) {
+    res.render('upload');
+});
+
+
+app.post('/upload-ftp', function (req, res) {
+    var form = new formidable.IncomingForm();
+    form.parse(req, function (err, fields, files) {
+
+        var imgName = "undefined";
+        security.GenerateUniqueID((result) => imgName = result);
+
+        var opath = files.filetoupload.path;
+        var npath = './tempUpload/' + imgName + "." + files.filetoupload.type.split("/")[1];
+
+        fs.rename(opath, npath, function (err) {
+            if (err) throw err;
+
+            var uploader_id = 0;
+            account.GetUserId(req, (result) => uploader_id = result);
+
+            //////////////////////////////////
+            //// adding to database //////////
+            //////////////////////////////////
+
+            var c = new client(); // c === ftp client
+
+            c.on('ready', function () {
+                c.put(npath, (imgName + "." + files.filetoupload.type.split("/")[1]), function (err) {
+                    if (err) throw err;
+                    c.end();
+                })
+            });
+
+            c.connect(
+                {
+                    host: "ftp.geocities.ws",
+                    user: "photographnation",
+                    password: "ayear789"
+                });
+            res.redirect("/");
+        });
+    });
+
+});
+
+
 
 app.get('/', function (req, res) {
     account.isAutheticated(req, function (result) {
