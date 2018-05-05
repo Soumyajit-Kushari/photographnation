@@ -44,7 +44,7 @@ app.get('/img', function (req, res) {
         db.forEach(img => {
             account.GetUserId(req, function (UserID) {
                 if (img.uploader == UserID)
-                    res.write("<img class='box img-box' src='./Uploads/" + img.guid + '.' + img.type + "'/>\n");
+                    res.write("<img class='box img-box' src='http://www.geocities.ws/photographnation/" + img.guid + '.' + img.type + "'/>\n");
             });
         });
         res.end();
@@ -73,15 +73,42 @@ app.post('/upload-ftp', function (req, res) {
             var uploader_id = 0;
             account.GetUserId(req, (result) => uploader_id = result);
 
-            //////////////////////////////////
-            //// adding to database //////////
-            //////////////////////////////////
+            //// UPLOADING TO GEOCITES
 
             var c = new client(); // c === ftp client
 
             c.on('ready', function () {
                 c.put(npath, (imgName + "." + files.filetoupload.type.split("/")[1]), function (err) {
-                    if (err) throw err;
+
+                    if (err) {
+                        console.log(err);
+                    }
+
+
+                    //////////////////////////////////
+                    //// adding to database //////////
+                    //////////////////////////////////
+
+                    var data = "[]";
+
+                    fs.readFile("./Data/uploads.json", function (err, data) {
+                        if (err) throw err;
+
+                        var db = JSON.parse(data);
+
+                        var UserID = "";
+                        account.GetUserId(req, (result) => UserID = result);
+
+                        db.push({ "guid": imgName, 'uploader': UserID, 'type': files.filetoupload.type.split("/")[1] })
+                        data = JSON.stringify(db);
+
+
+                        fs.writeFile("./Data/uploads.json", data, function (err, data) {
+                            if (err) throw err;
+                            fs.unlink(npath, (err) => console.log(err));
+                        });
+                    });
+
                     c.end();
                 })
             });
@@ -92,6 +119,7 @@ app.post('/upload-ftp', function (req, res) {
                     user: "photographnation",
                     password: "ayear789"
                 });
+
             res.redirect("/");
         });
     });
