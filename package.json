@@ -2,9 +2,12 @@
   "name": "visualartist",
   "version": "1.0.0",
   "description": "a social network for artist and photographers",
-  "main": "index.js",
+  "main": "app.js",
+  "engines": {
+    "node": ">=8.10.0"
+  },
   "scripts": {
-    "test": "node index.js"
+    "test": "node app.js"
   },
   "repository": {
     "type": "git",
