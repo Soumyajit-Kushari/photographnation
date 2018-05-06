@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "a social network for artist and photographers",
   "main": "app.js",
-  "engines": {
-    "node": ">=8.10.0"
-  },
   "scripts": {
     "test": "node app.js"
   },
