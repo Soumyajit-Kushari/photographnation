@@ -52,11 +52,6 @@ app.get('/img', function (req, res) {
 
 });
 
-app.get('/upload', function (req, res) {
-    res.render('upload');
-});
-
-
 app.post('/upload-ftp', function (req, res) {
     var form = new formidable.IncomingForm();
     form.parse(req, function (err, fields, files) {
@@ -74,52 +69,50 @@ app.post('/upload-ftp', function (req, res) {
             account.GetUserId(req, (result) => uploader_id = result);
 
             //// UPLOADING TO GEOCITES
+                var c = new client(); // c === ftp client
 
-            var c = new client(); // c === ftp client
+                c.on('ready', function () {
+                    c.put(npath, (imgName + "." + files.filetoupload.type.split("/")[1]), function (err) {
 
-            c.on('ready', function () {
-                c.put(npath, (imgName + "." + files.filetoupload.type.split("/")[1]), function (err) {
-
-                    if (err) {
-                        console.log(err);
-                    }
-
-
-                    //////////////////////////////////
-                    //// adding to database //////////
-                    //////////////////////////////////
-
-                    var data = "[]";
-
-                    fs.readFile("./Data/uploads.json", function (err, data) {
-                        if (err) throw err;
-
-                        var db = JSON.parse(data);
-
-                        var UserID = "";
-                        account.GetUserId(req, (result) => UserID = result);
-
-                        db.push({ "guid": imgName, 'uploader': UserID, 'type': files.filetoupload.type.split("/")[1] })
-                        data = JSON.stringify(db);
+                        if (err) {
+                            console.log(err);
+                        }
 
 
-                        fs.writeFile("./Data/uploads.json", data, function (err, data) {
+                        //////////////////////////////////
+                        //// adding to database //////////
+                        //////////////////////////////////
+
+                        var data = "[]";
+
+                        fs.readFile("./Data/uploads.json", function (err, data) {
                             if (err) throw err;
-                            fs.unlink(npath, (err) => console.log(err));
+
+                            var db = JSON.parse(data);
+
+                            var UserID = "";
+                            account.GetUserId(req, (result) => UserID = result);
+
+                            db.push({ "guid": imgName, 'uploader': UserID, 'type': files.filetoupload.type.split("/")[1] })
+                            data = JSON.stringify(db);
+
+
+                            fs.writeFile("./Data/uploads.json", data, function (err, data) {
+                                if (err) throw err;
+                                fs.unlink(npath, (err) => console.log(err));
+                            });
                         });
-                    });
 
-                    c.end();
-                })
-            });
-
-            c.connect(
-                {
-                    host: "ftp.geocities.ws",
-                    user: "photographnation",
-                    password: "ayear789"
+                        c.end();
+                    })
                 });
 
+                c.connect(
+                    {
+                        host: "ftp.geocities.ws",
+                        user: "photographnation",
+                        password: "ayear789"
+                    });
             res.redirect("/");
         });
     });
@@ -127,16 +120,27 @@ app.post('/upload-ftp', function (req, res) {
 });
 
 
+app.get('/home', function (req, res) {
+
+    /// this page requires authentication
+
+    account.isAutheticated(req, function (result) {
+        if (!result) res.redirect("/");
+
+        account.GetUserEmail(req, function (err, email) {
+            res.render('home', {
+                email: email,
+                email_md5: md5(email)
+            });
+        })
+    });
+})
+
 
 app.get('/', function (req, res) {
     account.isAutheticated(req, function (result) {
         if (result) {
-            account.GetUserEmail(req, function (err, email) {
-                res.render('home', {
-                    email: email,
-                    email_md5: md5(email)
-                });
-            })
+            res.redirect("/home");
         }
         else
             if (LoginAttempts < 1)

@@ -1,9 +1,13 @@
+
 body
 {
    font-family:  Helvetica,Helvetica Neue,Arial,sans-serif;   
    word-wrap: break-word;
    background-color:  #E6E6E6;
- 
+}
+
+a{
+    cursor: pointer;
 }
 
 body.blue{
@@ -42,12 +46,11 @@ div
 .box
 {
     float: left;
-    color:white;
-    padding: 20px;
-    box-shadow: 0px 0px 35px rgba(0,0,0,0.37);
-    border-radius: 23px;
-    margin:10px;
-    background:  rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    border-radius: 5px;
+    margin: 5px 10;
+    background: white;
+    box-shadow: 3px 2px 2px rgba(0, 0, 0,0.3);
 }
 
 .box.blue
@@ -72,12 +75,13 @@ div
 }
 
 label{
-    color: white;
     font-size: 12px;
     font-weight: 400;
     text-align: left;
     padding: 10px;
+    color:dimgray
 }
+
 #login-form
 {
     position: fixed;
@@ -92,13 +96,12 @@ label{
     width: 100%;
 }
 
-input[type=text],input[type=password],input[type=email]{
+input[type=text],input[type=password],input[type=email],input[type=file]{
     border: none;
     border-bottom: 1px solid #fff;
     background: transparent;
     outline: none;
-    background-color:  rgba(0, 0, 0, 0.5);
-
+  background-color: #FAFFBD;
     text-align: center;
     font-size: 26px;
     color: #FFFFFF;
@@ -107,7 +110,9 @@ input[type=text],input[type=password],input[type=email]{
     font-family: Helvetica, Helvetica Neue, Arial, sans-serif;
     font-weight: bold;
 }
-
+input[type=text]:active,input[type=password]:active,input[type=email]:active{
+    background-color: #FAFFBD;
+}
 input[placeholder] {
     color: dimgrey;
     font-size: 14px;
@@ -116,7 +121,7 @@ input[placeholder] {
     letter-spacing: 1px;
 }
 
-button[type=submit],button{
+button[type=submit],button,.btn{
     width: 100%;
     border-style: solid;
     border-width: 4px;
@@ -147,4 +152,9 @@ button:focus,input:focus
     color:grey;
     margin:20px;
     font-size: 14px;
+}
+
+#home
+{
+ margin-top:100px;
 }

@@ -1,6 +1,8 @@
 const fs = require('fs')
     , security = require('./security');
 
+const LoginTime = 60 * 60 * 24 * 7 * 1000;
+
 exports.isAutheticated = function (req, callback) {
     return req.cookies.guid == null ?
         callback(false) :
@@ -16,7 +18,7 @@ exports.GetUserId = function (req, callback) {
         else {
             return callback("USER NOT LOGGED IN");
         }
-    });;
+    });
 }
 exports.GetUserEmail = function (req, callback) {
     exports.isAutheticated(req, function (result) {
@@ -46,7 +48,7 @@ exports.Login = function (res, email, pass, callback) {
 
         db.forEach(user => {
             security.comparePassword(pass, user.pass, function name(err, isPasswordMatch) {
-                if (isPasswordMatch) res.cookie("guid", user.guid);
+                if (isPasswordMatch) res.cookie("guid", user.guid, { 'maxAge': LoginTime });
                 return callback(null, isPasswordMatch && (user.email == email));
             });
         });
