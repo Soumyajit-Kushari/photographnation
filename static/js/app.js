@@ -13,6 +13,17 @@ var app = {
     infoContainer: document.querySelector('.info-container')
 };
 
+
+var UI = {
+    navbuttons: document.getElementById("nav-buttons"),
+    logoutbtn: document.getElementById("logout-btn"),
+    uploadbtn: document.getElementById("upload-btn"),
+    uploadCancel: document.getElementById('uploadcancel'),
+    guid_input: document.getElementById("hidden_guid_input"),
+    err: document.getElementById("err-text")
+};
+
+
 app.spinnertoggle = function () {
     var hidden = !(app.isloading);
     if (hidden)
@@ -126,11 +137,15 @@ if (req[0] != "" /*ie no command has been sent*/) {
 
     if (req[0] == 'login') { // checking login request
         if (req[1] != 'NaN') {
-            localStorage.setItem("guid", req[1]);   
-        }    
-    }
+            localStorage.setItem("guid", req[1]);
+            location.replace("/");
+        }
+        else{
+            UI.err.innerHTML ="Incoorect Username or passwords";
+        }
 
-    location.replace("/");
+        
+    }
 }
 
 
@@ -138,16 +153,6 @@ if (req[0] != "" /*ie no command has been sent*/) {
 
 app.networkCheck();
 app.checkAuthentication();
-
-
-var UI = {
-    navbuttons: document.getElementById("nav-buttons"),
-    logoutbtn: document.getElementById("logout-btn"),
-    uploadbtn: document.getElementById("upload-btn"),
-    uploadCancel: document.getElementById('uploadcancel'),
-    guid_input: document.getElementById("hidden_guid_input"),
-    err: document.querySelector("err")
-}
 
 if (app.isAuthenticated) {
     app.spinnertoggle();
@@ -177,13 +182,14 @@ if (app.isAuthenticated) {
             }
 
             checkforData();
-        }, 5000);
+        }, 1000);
     }
 
     app.loginform.style.display = "none";
     UI.navbuttons.style.display = "inline-block";
 }
 else {
+    console.log("app is not authenticated");
     UI.navbuttons.style.display = "none";
 }
 

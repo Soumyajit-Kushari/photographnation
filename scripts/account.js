@@ -48,17 +48,14 @@ exports.Login = function (res, email, pass, callback) {
         db.forEach(user => {
             security.comparePassword(pass, user.pass, function name(err, isPasswordMatch) {
                 i++;
-                if (isPasswordMatch && (user.email == email)) {
-                    return callback(null, isPasswordMatch && (user.email == email), user.guid);
+                var result = isPasswordMatch && (user.email == email);
+                if (result) {
+                    return callback(null, result, user.guid);
+                }
+                else if (i == db.length && !result) {
+                    return callback("err login you in");
                 }
             });
         });
-
-        console.log(i);
-        
-        if (db.length == i) {
-            console.log("err login you in");    
-            return callback("err login you in");
-        }
     });
 }
