@@ -1,18 +1,24 @@
 const express = require('express')
-    , account = require('./account')
+    , account = require('./scripts/account')
     , cookieParser = require('cookie-parser')
     , bodyParser = require('body-parser')
     , md5 = require('md5')
     , fs = require('fs')
     , formidable = require('formidable')
     , client = require('ftp')
-    , security = require('./security');
+    , security = require('./scripts/security')
+    , url = require('url');
+
 
 const app = express();
 
 var LoginAttempts = 0;
-var MaxLoginAttempts = 5;
-var LoginRenewTime = 60 * 1000; // milli seconds
+
+/*
+    , MaxLoginAttempts = 5
+    , LoginRenewTime = 60 * 1000
+    , LoginTime = 60 * 60 * 24 * 7 * 1000;
+*/
 
 // setting up the app
 
@@ -20,7 +26,7 @@ app.listen(process.env.PORT || 1337);
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static('Static'));
+app.use(express.static('static'));
 app.set('view engine', 'pug');
 
 // Request for Login
@@ -28,28 +34,36 @@ app.set('view engine', 'pug');
 app.post('/Login', function (req, res) {
     var email = req.body.email;
     var pass = req.body.pass;
+    var guid = 'NaN';
 
-    account.Login(res, email, pass, function (err, result) {
-        res.redirect("/");
-        LoginAttempts++;
+    account.Login(res, email, pass, function (err, result, id) {
+        if (result) {
+            guid = id;
+        }
+
+        res.redirect("/?login:" + guid);
     });
-
 });
 
 app.get('/img', function (req, res) {
-
-    fs.readFile("./Data/uploads.json", function (err, data) {
+    fs.readFile("./data/uploads.json", function (err, data) {
+        if(err) throw err;
+        
         var db = JSON.parse(data);
+        var q = url.parse(req.url, true).query;
+        var guid = q.guid;
+        var data = [];
 
-        db.forEach(img => {
-            account.GetUserId(req, function (UserID) {
-                if (img.uploader == UserID)
-                    res.write("<img class='box img-box' src='http://www.geocities.ws/photographnation/" + img.guid + '.' + img.type + "'/>\n");
-            });
-        });
+        for (let i = db.length - 1; i >= 0; i--) {
+            var img = db[i];
+
+            if (img.uploader == guid)
+                data.push(img);
+        }
+
+        res.json(data);
         res.end();
     });
-
 });
 
 app.post('/upload-ftp', function (req, res) {
@@ -60,59 +74,56 @@ app.post('/upload-ftp', function (req, res) {
         security.GenerateUniqueID((result) => imgName = result);
 
         var opath = files.filetoupload.path;
-        var npath = './tempUpload/' + imgName + "." + files.filetoupload.type.split("/")[1];
+        var npath = './temp_upload/' + imgName + "." + files.filetoupload.type.split("/")[1];
 
         fs.rename(opath, npath, function (err) {
             if (err) throw err;
 
             var uploader_id = 0;
-            account.GetUserId(req, (result) => uploader_id = result);
+            uploader_id = fields.guid;
 
             //// UPLOADING TO GEOCITES
-                var c = new client(); // c === ftp client
+            var c = new client(); // c === ftp client
 
-                c.on('ready', function () {
-                    c.put(npath, (imgName + "." + files.filetoupload.type.split("/")[1]), function (err) {
+            c.on('ready', function () {
+                c.put(npath, (imgName + "." + files.filetoupload.type.split("/")[1]), function (err) {
 
-                        if (err) {
-                            console.log(err);
-                        }
+                    if (err) {
+                        console.log(err);
+                    }
 
 
-                        //////////////////////////////////
-                        //// adding to database //////////
-                        //////////////////////////////////
+                    //////////////////////////////////
+                    //// adding to database //////////
+                    //////////////////////////////////
 
-                        var data = "[]";
+                    var data = "[]";
 
-                        fs.readFile("./Data/uploads.json", function (err, data) {
+                    fs.readFile("./data/uploads.json", function (err, data) {
+                        if (err) throw err;
+
+                        var db = JSON.parse(data);
+
+                        db.push({ "guid": imgName, 'uploader': uploader_id, 'type': files.filetoupload.type.split("/")[1], 'date': Date.now(), 'tags': fields.tags.toString() })
+                        data = JSON.stringify(db);
+
+
+                        fs.writeFile("./data/uploads.json", data, function (err, data) {
                             if (err) throw err;
-
-                            var db = JSON.parse(data);
-
-                            var UserID = "";
-                            account.GetUserId(req, (result) => UserID = result);
-
-                            db.push({ "guid": imgName, 'uploader': UserID, 'type': files.filetoupload.type.split("/")[1] })
-                            data = JSON.stringify(db);
-
-
-                            fs.writeFile("./Data/uploads.json", data, function (err, data) {
-                                if (err) throw err;
-                                fs.unlink(npath, (err) => console.log(err));
-                            });
+                            fs.unlink(npath, (err) => console.log(err));
                         });
-
-                        c.end();
-                    })
-                });
-
-                c.connect(
-                    {
-                        host: "ftp.geocities.ws",
-                        user: "photographnation",
-                        password: "ayear789"
                     });
+
+                    c.end();
+                })
+            });
+
+            c.connect(
+                {
+                    host: "ftp.geocities.ws",
+                    user: "photographnation",
+                    password: "ayear789"
+                });
             res.redirect("/");
         });
     });
@@ -120,24 +131,7 @@ app.post('/upload-ftp', function (req, res) {
 });
 
 
-app.get('/home', function (req, res) {
-
-    /// this page requires authentication
-
-    account.isAutheticated(req, function (result) {
-        if (!result) res.redirect("/");
-
-        account.GetUserEmail(req, function (err, email) {
-            res.render('home', {
-                email: email,
-                email_md5: md5(email)
-            });
-        })
-    });
-})
-
-
-app.get('/', function (req, res) {
+/*app.get('/', function (req, res) {
     account.isAutheticated(req, function (result) {
         if (result) {
             res.redirect("/home");
@@ -167,7 +161,4 @@ app.get('/', function (req, res) {
                 });
             }
     });
-});
-
-
-
+});*/

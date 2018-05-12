@@ -1,8 +1,17 @@
-"# photographnation" 
+# photographnation
+
+## a social network for artist & photographers
 
 visit https://photographnation.azurewebsites.net
 
-default user
+default users 
 
-email : someone@example.com
-password : spiderman
+email : spiderman@marvel.com \
+password : spiderman \
+role : admin
+
+email : deadpool@marvel.com \
+password : deadpool \
+role : user
+
+report errors @ ayushkumar121@outlook.com

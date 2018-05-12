@@ -1,15 +1,12 @@
 const fs = require('fs')
     , security = require('./security');
 
-const LoginTime = 60 * 60 * 24 * 7 * 1000;
-
+/*
 exports.isAutheticated = function (req, callback) {
     return req.cookies.guid == null ?
         callback(false) :
         callback(true);
 }
-
-
 exports.GetUserId = function (req, callback) {
     exports.isAutheticated(req, function (result) {
         if (result) {
@@ -23,7 +20,7 @@ exports.GetUserId = function (req, callback) {
 exports.GetUserEmail = function (req, callback) {
     exports.isAutheticated(req, function (result) {
         if (result) {
-            fs.readFile("./Data/accounts.json", function (err, data) {
+            fs.readFile("./data/accounts.json", function (err, data) {
                 if (err) return callback(err);
 
                 var db = JSON.parse(data);
@@ -39,18 +36,29 @@ exports.GetUserEmail = function (req, callback) {
         }
     });
 }
+*/
 
 exports.Login = function (res, email, pass, callback) {
-    fs.readFile("./Data/accounts.json", function (err, data) {
-        if (err) return callback(err);
+    fs.readFile("./data/accounts.json", function (err, data, guid) {
+        if (err) console.log(err);
 
         var db = JSON.parse(data);
+        var i = 0;
 
         db.forEach(user => {
             security.comparePassword(pass, user.pass, function name(err, isPasswordMatch) {
-                if (isPasswordMatch) res.cookie("guid", user.guid, { 'maxAge': LoginTime });
-                return callback(null, isPasswordMatch && (user.email == email));
+                i++;
+                if (isPasswordMatch && (user.email == email)) {
+                    return callback(null, isPasswordMatch && (user.email == email), user.guid);
+                }
             });
         });
+
+        console.log(i);
+        
+        if (db.length == i) {
+            console.log("err login you in");    
+            return callback("err login you in");
+        }
     });
 }

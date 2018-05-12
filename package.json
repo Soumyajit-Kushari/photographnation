@@ -1,5 +1,5 @@
 {
-  "name": "visualartist",
+  "name": "photographnation",
   "version": "1.0.0",
   "description": "a social network for artist and photographers",
   "main": "app.js",
@@ -8,10 +8,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "visualartist"
+    "url": "https://github.com/ayushkumar121/photographnation"
   },
   "keywords": [
-    "visualartist"
+    "photographnation"
   ],
   "author": "worktogether",
   "license": "MIT",

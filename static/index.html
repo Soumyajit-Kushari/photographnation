@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Photographnation</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/inline.css">
+</head>
+
+<body>
+    <header class="header">
+        <h1 class="header__title">Photographnation</h1>
+        <span id="nav-buttons">
+            <button title="upload" id="upload-btn" class="headerButton">
+                <i class="material-icons">cloud_upload</i>
+            </button>
+            <button title="logout" id="logout-btn" class="headerButton">
+                <i class="material-icons">launch</i>
+            </button>
+        </span>
+    </header>
+
+    <nav class="nav">
+
+    </nav>
+
+    <div class="info-container" id="info-container">
+
+    </div>
+
+    <main id="main" class="main">
+        <form id="login-form" method="POST" class="card" action="/Login">
+            <div class="form-title">Login</div>
+            <input type="email" name="email" placeholder="someone@example.com" />
+            <div></div>
+            <input type="password" name="pass" placeholder="password" />
+            <div></div>
+            <input type="submit" class="mdl-button mdl-button--primary mdl-button--raised" value="login">
+
+            <p class="err"></p>
+        </form>
+    </main>
+
+    <div class="dialog-container">
+        <div id="upload-dialog" class="dialog">
+            <div class="dialog-body">
+                <form id="upload-form" method="POST" action="/upload-ftp" enctype="multipart/form-data">
+                    <div class="form-title">Upload</div>
+
+                    <input type="file" name="filetoupload" placeholder="Select a image" required/>
+                    <div></div>
+                    <input type="text" name="tags" placeholder="eg. flower,landscape" required/>
+                    <div></div>
+
+
+                    <!--hidden data-->
+                    <input type="text" name="guid" id="hidden_guid_input"/>
+                    <!--hidden data-->
+
+                    <input type="submit" class="mdl-button mdl-button--primary mdl-button--raised" value="upload">
+                    <input type="button" class="mdl-button mdl-button--raised" id="uploadcancel" value="cancel">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="loader" style="display: none;">
+        <svg viewBox="0 0 32 32" width="32" height="32">
+            <circle id="spinner" cx="16" cy="16" r="14" fill="none"></circle>
+        </svg>
+    </div>
+
+    <script src="/js/app.js" async></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js').then(function (registration) {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }).catch(function (err) {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        }
+    </script>
+</body>
+
+</html>
