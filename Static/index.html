@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Photographnation</title>
+
+    <meta name="theme-color" content="#00A4FF">
+    <meta name="title" content="Photographnation" />
+    <link rel="shortlink" href="http://photographnation.azurewebsites.net" />
+    <link rel="canonical" href="http://photographnation.azurewebsites.net" />
+    <meta name="description" content="a social network for photographers and a place for competitions" />
+    <meta name="keywords" content="photographnation,photograph,picture,nation,pn,PN,picturenature,photograph nation" />
+    <meta name="MobileOptimized" content="width" />
+    <meta name="HandheldFriendly" content="true" />
+
+
+    <link rel="preload" href="css/inline.css" as="style" />
+    <link rel="preload" href="https://apis.google.com/js/platform.js" as="script" />
+    <link rel="preload" href="./js/app.js" as="script" />
+    <link rel="preload" href="./js/customElements.js" as="script" />
+
+    <link rel="icon" href="images/icons/icon-192x192.png" sizes="192x192" />
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="428683241326-u1dcha2m25lfa6up3r5m60bm5ns7j4pe.apps.googleusercontent.com">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <link rel="stylesheet" type="text/css" href="css/inline.css">
+    <script src="/js/customElements.js" async></script>
+
+    <script type="application/ld+json">
+        {
+            "@context": "http://schema.org",
+            "@type": "Latest Uploads",
+            "image": [
+              "https://dummyimage.com/100",
+              "https://dummyimage.com/100",
+              "https://dummyimage.com/100"
+             ]
+            }
+                
+        </script>
+</head>
+
+<body>
+   <header class="header">
+
+        <a area-label="menu" id="menu-button" style="display: none;" class="headerButton">
+            <i class="material-icons">menu</i>
+        </a>
+
+        <h1 class="header__title">
+
+            <a area-label="Photographnation" href="#" alt="home">
+                <img alt="Photographnation" src="images/icons/icon-128x128.png" height="30">
+            </a>
+
+        </h1>
+        <span id="nav-buttons" style="display: none;">
+
+            <a style="display: none" area-label="add to home screen" class="headerButton" id="install">
+                <i class="material-icons">add_to_home_screen</i>
+            </a>
+
+            <a area-label="search" id="search">
+                <i class="material-icons">search</i>
+            </a>
+            <span style="display: none" id="search-clear" class="mdl-chip mdl-chip--deletable headerButton tag_chip ">
+                <span id="tag" class="mdl-chip__text"></span>
+                <button onclick="changeGlobalTag();" type="button" class="mdl-chip__action">
+                    <i class="material-icons">cancel</i>
+                </button>
+            </span>
+        </span>
+    </header>
+
+    <nav class="app-drawer" style="display: none;">
+        <div class="nav-header">
+            <a id="app-drawer-close" style="color: white;">
+                <i class="material-icons">close</i>
+            </a>
+        </div>
+        <div class="nav-hero">
+            <img id="profile" src="https://dummyimage.com/100" class="profile" />
+            <span id="user-name">loading...</span>
+        </div>
+        <div class="nav-content">
+            <ul class="nav-links">
+                <li>
+                    <a target="_blank" href="https://github.com/ayushkumar121/photographnation">
+                        github
+                    </a>
+                </li>
+                <li>
+                    <a onclick="signOut();">
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="upload-container">
+        <a class="mdl-button mdl-button--fab" style="display: none;" id="upload-btn">
+            <i class="material-icons">cloud_upload</i>
+        </a>
+    </div>
+
+    <main id="main" class="main">
+        <div id="login-form" class="card" style="margin-top:60px;box-shadow: none;">
+            <h1>Photographnation</h1>
+            <br/>
+            <div class="g-signin2" data-onsuccess="onSignIn" data-width="256" data-longtitle="true" data-theme="light"></div>
+        </div>
+
+        <div id="img-data"></div>
+        <div id="load-next-container">
+            <button area-label="Previous page" class="mdl-button mdl-button--colored" id="load-pre">
+                Previous
+            </button>
+            <button area-label="next page" class="mdl-button mdl-button--colored" id="load-next">
+                Next
+            </button>
+        </div>
+
+    </main>
+
+    <div class="dialog-container">
+
+        <div id="upload-dialog" style="display: none;" class="dialog">
+            <div class="dialog-body">
+                <form id="upload-form" method="POST" action="/upload" enctype="multipart/form-data">
+                    <div class="form-title">Upload</div>
+
+                    <input type="file" accept="image/*" name="filetoupload" placeholder="Select a image" required/>
+                    <div></div>
+                    <input type="text" name="tags" placeholder="Enter tags eg. flower,landscape" required/>
+                    <div></div>
+
+
+                    <!--hidden data-->
+                    <input type="text" name="guid" id="hidden_guid_input" readonly/>
+                    <!--hidden data-->
+                    <div></div>
+
+                    <input type="submit" class="mdl-button mdl-button--colored mdl-button--raised" value="upload">
+                    <input type="button" class="mdl-button" id="uploadcancel" value="cancel">
+
+                    <p style="font-size: 14px;color:#888;margin-top:20px;">tags will enable searching</p>
+
+                </form>
+            </div>
+        </div>
+
+        <div id="search-dialog" style="display: none;" class="dialog">
+            <div class="dialog-body">
+                <h2>Search</h2>
+                <input type="text" onchange="loadSearchResults();" autofocus id="search-text" placeholder="Enter tags eg.flowers,backyard"
+                />
+                <br/>
+                <br/>
+                <button class="mdl-button mdl-button--colored mdl-button--raised" onclick="loadSearchResults()" id="search-btn">
+                    Search
+                </button>
+                <button class="mdl-button" id="search-cancel">
+                    Cancel
+                </button>
+
+            </div>
+        </div>
+
+        <div id="comment-dialog" style="display: none;" class="dialog">
+            <div class="dialog-body">
+                <div>
+                    <a id="comment-close" style="float:right" href="#">
+                        <i class="material-icons">cancel</i>
+                    </a>
+                </div>
+                <div>
+                    <iframe></iframe>
+               </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loader" style="display: none;">
+        <svg viewBox="0 0 32 32" width="32" height="32">
+            <circle id="spinner" cx="16" cy="16" r="14" fill="none"></circle>
+        </svg>
+    </div>
+
+
+    <script src="/js/app.js" async></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(function (registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+
+                }).catch(function (err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+        }
+
+    </script>
+
+</body>
+
+</html>
